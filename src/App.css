@@ -36,3 +36,113 @@
     transform: rotate(360deg);
   }
 }
+
+@font-face {
+  font-family: 'HSGyeoulNoonkott20';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/HSGyeoulNoonkott20.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face { 
+  font-family: 'S-CoreDream-4Regular'; 
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff') format('woff'); 
+  font-weight: normal; 
+  font-style: normal; 
+}
+
+@font-face { font-family: 'S-CoreDream-8Heavy'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff') format('woff'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'S-CoreDream-3Light'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff'); font-weight: normal; font-style: normal; }
+
+.custom-font {
+  font-family: 'HSGyeoulNoonkott20', sans-serif;
+}
+
+.scoreheavy-font {
+  font-family: 'S-CoreDream-8Heavy', sans-serif;
+}
+
+.scoreregular-font {
+  font-family: 'S-CoreDream-4Regular', sans-serif;
+}
+
+.scorelight-font {
+  font-family: 'S-CoreDream-3Light', sans-serif;
+}
+
+.logo-image {
+  max-width: 50px; 
+  height: auto;
+}
+
+/* 메인 이미지 스타일 */
+.main-image {
+  max-width: 150px;
+  height: auto; 
+}
+
+/* 버튼 스타일 추가 */
+button {
+  cursor: pointer;
+}
+/* 
+.button-green {
+  background-color: #088762;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.button-green:hover {
+  background-color: #01ae5b;
+}
+
+.button-green:active {
+  background-color: #00d748;
+}
+
+.button-dark-green {
+  background-color: #088762;
+  color: white;
+  padding: 8px 16px;
+  border: 1px solid #01ae5b;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+.button-dark-green:hover {
+  background-color: #01ae5b;
+  border-color: #00d748;
+}
+
+.button-dark-green:active {
+  background-color: #00d748;
+}
+
+.button-light-green {
+  background-color: #01ae5b;
+  color: white;
+  padding: 8px 16px;
+  border: 1px solid #088762;
+  border-radius: 4px;
+  transition: all 0.3s ease-in-out;
+}
+
+.button-light-green:hover {
+  background-color: #00d748;
+  border-color: white;
+}
+
+.button-light-green:active {
+  background-color: #088762;
+}
+
+.admin-button {
+  padding: 8px 16px;
+  background-color: #088762;
+} */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
