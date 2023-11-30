@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 import VolunteerModal from './VolunteerModal';
 import ReviewModal from './ReviewModal';
 
 const logoImage = `${process.env.PUBLIC_URL}/logo.png`;
+
+// Axios 설정에 CSRF 토큰을 포함
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+axios.defaults.xsrfCookieName = 'csrftoken';
 
 const volunteerActivities = [
     { title: "환경 정화 활동", description: "해변가와 공원을 청소하는 봉사활동입니다. 자연을 사랑하는 분들에게 추천드려요.", location: "서울시 강남구", startDate: "2023-12-01", endDate: "2023-12-31", applyStart: "2023-11-01", applyEnd: "2023-11-20", status: "수락됨" },
@@ -75,10 +80,29 @@ function MyPage() {
         setSelectedReviewActivity(activity);
         setIsReviewModalOpen(true);
     };
+
     
+    // 로그아웃 함수
+    const handleLogout = async () => {
+        try {
+            await axios.post('http://127.0.0.1:8000/logout/');
+            // 로그아웃 성공 후 홈페이지로 리다이렉트
+            navigate('/');
+        } catch (error) {
+            console.error('로그아웃 에러:', error);
+            alert('로그아웃에 실패했습니다. 다시 시도해 주세요.');
+        }
+    };
+
     return (
         <div className="min-h-screen overflow-y-auto max-h-screen p-4 flex">
             <div className="w-1/4 p-4 border-r border-gray-300">
+                <button 
+                    onClick={handleLogout}
+                    className="bg-red-500 hover:bg-red-700 text-white scorelight-font font-bold py-2 px-4 rounded"
+                >
+                    로그아웃
+                </button>
                 <button onClick={() => setCurrentTab('personal')} className="block w-full text-left py-2 hover:bg-gray-100 scoreregular-font rounded">개인 봉사 현황</button>
                 <button onClick={() => setCurrentTab('corporate')} className="block w-full text-left py-2 hover:bg-gray-100 scoreregular-font rounded">기업 봉사 현황</button>
             </div>

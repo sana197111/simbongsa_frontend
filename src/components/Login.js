@@ -1,5 +1,7 @@
 // Login.js
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import "../index.css";
 import { Link } from 'react-router-dom';
@@ -9,8 +11,9 @@ const logoImage = `${process.env.PUBLIC_URL}/logo.png`;
 function Login() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
     // 아이디 유효성 검사
     if (userId.length < 4) {
@@ -25,6 +28,20 @@ function Login() {
     }
   
     // 로그인 로직을 여기에 추가하세요.
+    // 로그인 요청 데이터 준비
+    const loginData = {
+      username: userId,
+      password: password,
+    };
+
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/login/', loginData);
+      console.log(response.data);
+      navigate('/mypage'); 
+    } catch (error) {
+      console.error('로그인 에러:', error);
+      alert('로그인에 실패했습니다. 다시 시도해 주세요.');
+    }
   };  
 
   return (

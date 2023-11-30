@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import '../App.css';
 import "../index.css";
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const logoImage = `${process.env.PUBLIC_URL}/logo.png`;
 
@@ -12,8 +14,9 @@ function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const navigate = useNavigate();
 
-  const handleSignup = (event) => {
+  const handleSignup = async (event) => {
     event.preventDefault();
   
     // 아이디 유효성 검사
@@ -43,8 +46,24 @@ function Signup() {
       return;
     }
   
-    // 회원가입 로직을 여기에 추가하세요.
-  };  
+    // 사용자 데이터 준비
+    const userData = {
+      username: userId,
+      password: password,
+      name: name,
+      email: email,
+      phone_number: phoneNumber,
+    };
+
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/signup/', userData);
+      console.log(response.data);
+      navigate('/login');
+    } catch (error) {
+      console.error('회원가입 에러:', error);
+      alert('회원가입에 실패했습니다. 다시 시도해 주세요.');
+    }
+  };
 
   return (
     <div className="min-h-screen overflow-y-auto max-h-screen p-4 flex flex-col items-center justify-center">
