@@ -11,6 +11,7 @@ import Signup from './components/Signup';
 import VolunteerDetail from './components/VolunteerDetail';
 import VolunteerList from './components/VolunteerList';
 import Mypage from './components/Mypage';
+import CompanyLogin from './components/CompanyLogin';
 
 function App() {
   return (
@@ -34,9 +35,10 @@ function AppRoutes() {
       <Route path="/mbtitest/:type" element={<Result />} />
       <Route path="/signup" element={< Signup />} />
       <Route path="/login" element={< Login />} />
-      <Route path="/volunteer/:title" element={<VolunteerDetail />} />
+      <Route path="/volunteer/:event_id" element={<VolunteerDetail />} />
       <Route path="/volunteerlist" element={<VolunteerList />} />
       <Route path="/mypage" element={<Mypage />} />
+      <Route path="/company-login" element={<CompanyLogin />} />
     </Routes>
   );
 }

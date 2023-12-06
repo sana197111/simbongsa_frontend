@@ -1,7 +1,7 @@
 // Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../App.css';
 import "../index.css";
 import { Link } from 'react-router-dom';
@@ -12,6 +12,7 @@ function Login() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -35,9 +36,16 @@ function Login() {
     };
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/login/', loginData);
-      console.log(response.data);
-      navigate('/mypage'); 
+      const response = await axios.post('http://127.0.0.1:8000/login', loginData);
+      console.log(response.data.access); // access 토큰 로깅
+      localStorage.setItem('token', response.data.access); // 액세스 토큰 저장
+      
+      // 사용자가 /company-login 링크를 통해 왔는지 확인 후 적절하게 리다이렉트
+      if (location.state?.fromCorporate) {
+        navigate('/company-login');
+      } else {
+        navigate('/mypage');
+      }
     } catch (error) {
       console.error('로그인 에러:', error);
       alert('로그인에 실패했습니다. 다시 시도해 주세요.');

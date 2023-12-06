@@ -9,18 +9,18 @@ import axios from 'axios';
 const logoImage = `${process.env.PUBLIC_URL}/logo.png`;
 
 function Signup() {
-  const [userId, setUserId] = useState('');
+  const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [contact, setContact] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = async (event) => {
     event.preventDefault();
   
     // 아이디 유효성 검사
-    if (userId.length < 4) {
+    if (username.length < 4) {
       alert("아이디는 4자 이상이어야 합니다.");
       return;
     }
@@ -40,23 +40,23 @@ function Signup() {
     }
   
     // 전화번호 유효성 검사
-    const phoneRegex = /^\d{10,11}$/;
-    if (!phoneRegex.test(phoneNumber)) {
+    const contactRegex = /^\d{10,11}$/;
+    if (!contactRegex.test(contact)) {
       alert("올바른 전화번호 형식이 아닙니다. (10-11자리 숫자)");
       return;
     }
   
     // 사용자 데이터 준비
     const userData = {
-      username: userId,
+      username: username,
       password: password,
-      name: name,
+      name: name,  
       email: email,
-      phone_number: phoneNumber,
+      contact: contact        
     };
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/signup/', userData);
+      const response = await axios.post('http://127.0.0.1:8000/signup', userData);
       console.log(response.data);
       navigate('/login');
     } catch (error) {
@@ -79,8 +79,8 @@ function Signup() {
         <input
           type="text"
           placeholder="아이디"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
+          value={username}
+          onChange={(e) => setUserName(e.target.value)}
           className="mb-4 px-4 py-2 border border-gray-600"
         />
         <input
@@ -107,8 +107,8 @@ function Signup() {
         <input
           type="tel"
           placeholder="전화번호"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
           className="mb-8 px-4 py-2 border border-gray-600"
         />
         <button type="submit" className="scoreregular-font mb-4 px-6 py-2 border border-gray-600 border-solid hover:bg-[#018b63] hover:border-[#018b63] hover:text-white active:bg-[#016d53] transition duration-300 ease-in-out">

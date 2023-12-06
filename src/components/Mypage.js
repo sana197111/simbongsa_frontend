@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import VolunteerModal from './VolunteerModal';
-import ReviewModal from './ReviewModal';
 
 const logoImage = `${process.env.PUBLIC_URL}/logo.png`;
 
@@ -10,24 +9,60 @@ const logoImage = `${process.env.PUBLIC_URL}/logo.png`;
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 axios.defaults.xsrfCookieName = 'csrftoken';
 
-const volunteerActivities = [
-    { title: "환경 정화 활동", description: "해변가와 공원을 청소하는 봉사활동입니다. 자연을 사랑하는 분들에게 추천드려요.", location: "서울시 강남구", startDate: "2023-12-01", endDate: "2023-12-31", applyStart: "2023-11-01", applyEnd: "2023-11-20", status: "수락됨" },
-    { title: "도서관 정리 봉사", description: "지역 도서관의 책 정리 및 관리를 돕는 봉사활동입니다. 책과 도서관을 사랑하는 분들께 좋습니다.", location: "부산시 해운대구", startDate: "2023-11-15", endDate: "2023-11-30", applyStart: "2023-10-20", applyEnd: "2023-11-10", status: "수락됨" },
-    { title: "노인 복지관 도우미", description: "노인 복지관에서 어르신들의 일상생활을 돕는 활동입니다. 봉사 정신이 투철한 분들께 추천합니다.", location: "대구시 수성구", startDate: "2023-12-05", endDate: "2024-01-05", applyStart: "2023-11-10", applyEnd: "2023-11-30", status: "수락됨" },
-    { title: "유기동물 보호 활동", description: "유기동물 보호소에서 동물들을 돌보는 활동입니다. 동물을 사랑하는 마음이 있는 분들께 좋습니다.", location: "인천시 남동구", startDate: "2023-11-01", endDate: "2023-11-30", applyStart: "2023-10-15", applyEnd: "2023-10-25", status: "거절됨" },
-    { title: "어린이 교육 지원", description: "지역 아동센터에서 어린이들의 학습을 지원하는 활동입니다. 교육에 관심이 많은 분들에게 추천합니다.", location: "광주시 서구", startDate: "2023-10-20", endDate: "2023-11-20", applyStart: "2023-10-01", applyEnd: "2023-10-15", status: "수락됨" },
-    { title: "푸드뱅크 식품 정리", description: "푸드뱅크에서 기부받은 식품을 분류하고 정리하는 활동입니다. 식품 뱅크 운영에 기여하고 싶은 분들께 추천합니다.", location: "대전시 중구", startDate: "2023-12-10", endDate: "2023-12-25", applyStart: "2023-11-20", applyEnd: "2023-12-05", status: "수락됨" },
-    { title: "공원 녹화 활동", description: "지역 공원에서 식물 심기 및 관리를 돕는 활동입니다. 환경 보호에 기여하고 싶은 분들께 추천합니다.", location: "울산시 남구", startDate: "2023-11-05", endDate: "2023-11-19", applyStart: "2023-10-20", applyEnd: "2023-11-03", status: "거절됨" }
-];
-
 function MyPage() {
     const navigate = useNavigate();
     const [currentTab, setCurrentTab] = useState('personal');
     const [personalStatus, setPersonalStatus] = useState('applied'); // 'applied' 또는 'completed'
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
-    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-    const [selectedReviewActivity, setSelectedReviewActivity] = useState(null);
+    const [pastEvents, setPastEvents] = useState([]);
+    const [upcomingEvents, setUpcomingEvents] = useState([]);
+    const [corporateEvents, setCorporateEvents] = useState([]);
+    const { event_id } = useParams();
+
+    useEffect(() => {
+        if (currentTab === 'corporate') {
+            fetchCorporateEvents();
+        }
+    }, [currentTab]);
+
+    useEffect(() => {
+        axios.get('http://127.0.0.1:8000/api/mypage/', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+        .then(response => {
+            // past_events와 upcoming_events를 분리하여 상태 설정
+            setPastEvents(response.data.past_events);
+            setUpcomingEvents(response.data.upcoming_events);
+        })
+        .catch(error => {
+            console.error("봉사활동 목록을 불러오는 데 실패했습니다:", error);
+        });
+    }, []);
+
+    const fetchCorporateEvents = () => {
+        axios.get('http://127.0.0.1:8000/mypage/org/', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+        .then(response => {
+            setCorporateEvents(response.data);
+        })
+        .catch(error => {
+            console.error("기업 봉사활동 목록을 불러오는 데 실패했습니다:", error);
+        });
+    };
+
+    // 탭 변경 핸들러 수정
+    const handleTabChange = (tabName) => {
+        setCurrentTab(tabName);
+        if (tabName === 'corporate') {
+            fetchCorporateEvents();
+        }
+    };
 
     const handleButtonClick = (event, title, type) => {
         event.stopPropagation(); // 이벤트 전파 중단
@@ -35,9 +70,6 @@ function MyPage() {
         if (type === 'cancel') {
             console.log("신청 취소 처리:", title);
             // 신청 취소 로직 추가
-        } else if (type === 'review') {
-            console.log("후기 입력 페이지로 이동:", title);
-            // 후기 입력 페이지로 이동
         } else if (type === 'applications') {
             console.log("신청 현황 페이지로 이동:", title);
             navigate(`/volunteer/${title}/applications`);
@@ -51,43 +83,67 @@ function MyPage() {
     };
     
     const handleEditVolunteerActivity = (title) => {
-        const activity = volunteerActivities.find(a => a.title === title);
-        setSelectedActivity(activity);
+        const event = corporateEvents.find(a => a.title === title);
+        setSelectedActivity(event);
         setIsModalOpen(true);
         console.log("봉사활동 수정:", title);
     };
     
     // VolunteerModal의 '저장' 버튼 클릭 이벤트 핸들러
     const handleModalSave = (formData) => {
-        console.log("저장된 봉사활동 데이터:", formData);
+        // 새로운 봉사활동인 경우
+        if (!selectedActivity) {
+            axios.post('http://127.0.0.1:8000/api/upload_event', formData)
+                .then(response => {
+                    // 성공 처리
+                    console.log("봉사활동 추가 성공:", response.data);
+                })
+                .catch(error => {
+                    console.error("봉사활동 추가 실패:", error);
+                });
+        } else {
+            // 봉사활동 수정인 경우
+            axios.put(`http://127.0.0.1:8000/volunteer/${event_id}`, formData)
+                .then(response => {
+                    // 성공 처리
+                    console.log("봉사활동 수정 성공:", response.data);
+                })
+                .catch(error => {
+                    console.error("봉사활동 수정 실패:", error);
+                });
+        }
+
         setIsModalOpen(false);
-        // 여기에 formData를 사용하여 봉사활동 추가 또는 수정 로직을 구현
     };
 
-    // ReviewModal의 '저장' 버튼 클릭 이벤트 핸들러
-    const handleSaveReview = (reviewData) => {
-        console.log("저장된 리뷰 데이터:", reviewData);
-        setIsReviewModalOpen(false);
-        // 리뷰 저장 로직 구현
+
+    // 삭제 버튼 클릭 이벤트 핸들러
+    const handleDeleteVolunteerActivity = (title) => {
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            const event = corporateEvents.find(a => a.title === title);
+            axios.delete(`http://127.0.0.1:8000/volunteer/${event_id}`)
+                .then(response => {
+                    // 성공 처리
+                    console.log("봉사활동 삭제 성공");
+                })
+                .catch(error => {
+                    console.error("봉사활동 삭제 실패:", error);
+                });
+        }
     };
+
     
     const handleModalClose = () => {
         setIsModalOpen(false);
-    };
-
-    // 후기 입력 버튼 클릭 핸들러
-    const handleReviewButtonClick = (activity) => {
-        setSelectedReviewActivity(activity);
-        setIsReviewModalOpen(true);
     };
 
     
     // 로그아웃 함수
     const handleLogout = async () => {
         try {
-            await axios.post('http://127.0.0.1:8000/logout/');
-            // 로그아웃 성공 후 홈페이지로 리다이렉트
-            navigate('/');
+            await axios.post('http://127.0.0.1:8000/logout');
+            localStorage.removeItem('token');
+            navigate('/'); 
         } catch (error) {
             console.error('로그아웃 에러:', error);
             alert('로그아웃에 실패했습니다. 다시 시도해 주세요.');
@@ -103,8 +159,12 @@ function MyPage() {
                 >
                     로그아웃
                 </button>
-                <button onClick={() => setCurrentTab('personal')} className="block w-full text-left py-2 hover:bg-gray-100 scoreregular-font rounded">개인 봉사 현황</button>
-                <button onClick={() => setCurrentTab('corporate')} className="block w-full text-left py-2 hover:bg-gray-100 scoreregular-font rounded">기업 봉사 현황</button>
+                <button onClick={() => handleTabChange('personal')} className="block w-full text-left py-2 hover:bg-gray-100 scoreregular-font rounded">
+                    개인 봉사 현황
+                </button>
+                <button onClick={() => handleTabChange('corporate')} className="block w-full text-left py-2 hover:bg-gray-100 scoreregular-font rounded">
+                    기업 봉사 현황
+                </button>
             </div>
             <div className="w-3/4 p-4">
                 <Link to="/">
@@ -125,43 +185,37 @@ function MyPage() {
                         </div>
                         {personalStatus === 'applied' ? (
                             <div>
-                                {volunteerActivities.map((activity, index) => (
+                                {pastEvents.map((event, index) => (
                                     <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg w-full hover:bg-gray-100 active:bg-gray-200 transition duration-300 ease-in-out">
-                                        <Link to={`/volunteer/${activity.title}`} className="block mb-4">
-                                            <h3 className="text-lg font-semibold mb-1 scoreregular-font truncate">{activity.title}</h3>                                            
-                                            <p className="text-sm mb-2 scorelight-font truncate">{activity.description.length > 30 ? `${activity.description.substring(0, 70)}...` : activity.description}</p>
-                                            <p className="text-xs mb-1 scorelight-font truncate">위치: {activity.location}</p>
-                                            <p className="text-xs mb-1 scorelight-font truncate">봉사 기간: {activity.startDate} ~ {activity.endDate}</p>
-                                            <p className="text-xs scorelight-font truncate">신청 기간: {activity.applyStart} ~ {activity.applyEnd}</p>
-                                        </Link>
-                                        <button 
-                                            onClick={(e) => handleButtonClick(e, activity.title, 'cancel')}
-                                            className="bg-red-500 hover:bg-red-700 scorelight-font text-white font-bold py-2 px-4 rounded mr-2"
-                                        >
-                                            신청 취소
-                                        </button>
-                                        <span className="scorelight-font">{activity.status}</span>
-                                    </div>
+                                    <Link to={`/volunteer/${event.event_id}`} key={index} className="block mb-4">
+                                        <h3 className="text-lg font-semibold mb-1 scoreregular-font truncate">{event.title}</h3>                                            
+                                        <p className="text-sm mb-2 scorelight-font truncate">{event.description && event.description.length > 30 ? `${event.description.substring(0, 70)}...` : event.description}</p>
+                                        <p className="text-xs mb-1 scorelight-font truncate">위치: {event.location}</p>
+                                        <p className="text-xs mb-1 scorelight-font truncate">봉사 기간: {event.vol_start ? event.vol_start.substring(0, 10) : '날짜 미정'} ~ {event.vol_end ? event.vol_end.substring(0, 10) : '날짜 미정'}</p>
+                                        <p className="text-xs scorelight-font truncate">신청 기간: {event.apply_start ? event.apply_start.substring(0, 10) : '날짜 미정'} ~ {event.apply_end ? event.apply_end.substring(0, 10) : '날짜 미정'}</p>
+                                    </Link>
+                                    <button 
+                                        onClick={(e) => handleButtonClick(e, event.title, 'cancel')}
+                                        className="bg-red-500 hover:bg-red-700 scorelight-font text-white font-bold py-2 px-4 rounded mr-2"
+                                    >
+                                        신청 취소
+                                    </button>
+                                    <span className="scorelight-font">{event.status}</span>
+                                </div>
                                 ))}
                             </div>
                         ) : (
                             <div>
-                                {volunteerActivities.map((activity, index) => (
+                                {upcomingEvents.map((activity, index) => (
                                     <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg w-full hover:bg-gray-100 active:bg-gray-200 transition duration-300 ease-in-out">
-                                        <Link to={`/volunteer/${activity.title}`} className="block mb-4">
-                                            <h3 className="text-lg font-semibold mb-1 scoreregular-font truncate">{activity.title}</h3>
-                                            <p className="text-sm mb-2 scorelight-font truncate">{activity.description.length > 30 ? `${activity.description.substring(0, 70)}...` : activity.description}</p>
-                                            <p className="text-xs mb-1 scorelight-font truncate">위치: {activity.location}</p>
-                                            <p className="text-xs mb-1 scorelight-font truncate">봉사 기간: {activity.startDate} ~ {activity.endDate}</p>
-                                            <p className="text-xs scorelight-font truncate">신청 기간: {activity.applyStart} ~ {activity.applyEnd}</p>
-                                        </Link>
-                                        <button 
-                                            onClick={handleReviewButtonClick}
-                                            className="bg-blue-500 hover:bg-blue-700 text-white scorelight-font font-bold py-2 px-4 rounded"
-                                        >
-                                            후기 입력
-                                        </button>
-                                    </div>
+                                    <Link to={`/volunteer/${activity.event_id}`} key={index} className="block mb-4">
+                                        <h3 className="text-lg font-semibold mb-1 scoreregular-font truncate">{activity.title}</h3>
+                                        <p className="text-sm mb-2 scorelight-font truncate">{activity.description && activity.description.length > 30 ? `${activity.description.substring(0, 70)}...` : activity.description}</p>
+                                        <p className="text-xs mb-1 scorelight-font truncate">위치: {activity.location}</p>
+                                        <p className="text-xs mb-1 scorelight-font truncate">봉사 기간: {activity.vol_start ? activity.vol_start.substring(0, 10) : '날짜 미정'} ~ {activity.vol_end ? activity.vol_end.substring(0, 10) : '날짜 미정'}</p>
+                                        <p className="text-xs scorelight-font truncate">신청 기간: {activity.apply_start ? activity.apply_start.substring(0, 10) : '날짜 미정'} ~ {activity.apply_end ? activity.apply_end.substring(0, 10) : '날짜 미정'}</p>
+                                    </Link>
+                                </div>
                                 ))}
                             </div>
                         )}
@@ -178,7 +232,7 @@ function MyPage() {
                                 봉사활동 추가
                             </button>
                         </div>
-                        {volunteerActivities.map((activity, index) => (
+                        {corporateEvents.map((activity, index) => (
                             <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg w-full hover:bg-gray-100 active:bg-gray-200 transition duration-300 ease-in-out">
                                 <Link to={`/volunteer/${activity.title}`} className="block mb-4">
                                     <h3 className="text-lg font-semibold mb-1 scoreregular-font truncate">{activity.title}</h3>
@@ -199,6 +253,12 @@ function MyPage() {
                                     >
                                         수정
                                 </button>
+                                <button 
+                                onClick={(e) => handleDeleteVolunteerActivity(activity.title)}
+                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
+                                >
+                                    삭제
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -209,12 +269,6 @@ function MyPage() {
                 onClose={handleModalClose} 
                 activity={selectedActivity} 
                 onSave={handleModalSave} // 수정된 handleModalSave 함수 사용
-            />
-            <ReviewModal 
-                isOpen={isReviewModalOpen} 
-                onClose={() => setIsReviewModalOpen(false)} 
-                activity={selectedReviewActivity} 
-                onSaveReview={handleSaveReview} // 기존 handleSaveReview 함수 사용
             />
         </div>
     );

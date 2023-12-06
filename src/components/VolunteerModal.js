@@ -31,16 +31,19 @@ function VolunteerModal({ isOpen, onClose, activity, onSave }) {
                     <label className="block text-sm scorelight-font">위치</label>
                     <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="위치" className="mb-2 p-1 w-full scorelight-font border rounded" />
 
+                    <label className="block text-sm scorelight-font">MBTI</label>
+                    <textarea name="text" value={formData.mbti_type} onChange={handleChange} placeholder="MBTI" className="mb-2 p-1 w-full scorelight-font border rounded" />
+
                     <label className="block text-sm scorelight-font">봉사활동 기간</label>
                     <div className="flex space-x-2">
-                        <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} className="mb-2 p-1 border rounded" />
-                        <input type="date" name="endDate" value={formData.endDate} onChange={handleChange} className="mb-2 p-1 border rounded" />
+                        <input type="date" name="volStart" value={formData.vol_start} onChange={handleChange} className="mb-2 p-1 border rounded" />
+                        <input type="date" name="volEnd" value={formData.vol_end} onChange={handleChange} className="mb-2 p-1 border rounded" />
                     </div>
 
                     <label className="block text-sm scorelight-font">신청 기간</label>
                     <div className="flex space-x-2">
-                        <input type="date" name="applyStart" value={formData.applyStart} onChange={handleChange} className="mb-2 p-1 border rounded" />
-                        <input type="date" name="applyEnd" value={formData.applyEnd} onChange={handleChange} className="mb-2 p-1 border rounded" />
+                        <input type="date" name="applyStart" value={formData.apply_start} onChange={handleChange} className="mb-2 p-1 border rounded" />
+                        <input type="date" name="applyEnd" value={formData.apply_end} onChange={handleChange} className="mb-2 p-1 border rounded" />
                     </div>
 
                     <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">저장</button>
